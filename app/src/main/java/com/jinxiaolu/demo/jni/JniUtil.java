@@ -1,5 +1,7 @@
 package com.jinxiaolu.demo.jni;
 
+import android.content.Context;
+
 /**
  * Author:  Gavin
  * Email:   gavinking@163.com
@@ -35,4 +37,10 @@ public class JniUtil {
      * @return
      */
     public static native byte[] decrypt(byte[] data);
+
+    /**
+     * 获取应用签名的hash code
+     * @return
+     */
+    public static native int signatureHashCode(Object context);
 }

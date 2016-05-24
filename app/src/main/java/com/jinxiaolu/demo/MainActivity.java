@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.jinxiaolu.demo.jni.JniUtil;
 import com.jinxiaolu.demo.utils.Aes256Cryptor;
+import com.jinxiaolu.demo.utils.ApkSignatureProvider;
 import com.jinxiaolu.demo.utils.Hmacs256Signer;
 import com.kuaikuaiyu.demo.R;
 
@@ -23,8 +24,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         testHmacs256();
         testAes256();
+        testGetApkSignature();
     }
 
+    /**
+     * hmacs256 jni&java test
+     */
     private void testHmacs256() {
         Log.d(TAG, "======jni-hmacs256-test======");
         Log.d(TAG, com.jinxiaolu.demo.jni.JniUtil.hmas256Sign(TEST_STRING));
@@ -32,8 +37,10 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, Hmacs256Signer.hmacs256Sign(TEST_STRING));
     }
 
+    /**
+     * aes256 jni&java test
+     */
     private void testAes256() {
-
         try {
             Log.d(TAG, "======jni-encrypt-test======");
             byte[] data = JniUtil.encrypt(TEST_STRING.getBytes("UTF-8"));
@@ -54,6 +61,17 @@ public class MainActivity extends AppCompatActivity {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-
     }
+
+    /**
+     * apk signature jni&java test
+     */
+    private void testGetApkSignature() {
+        Log.d(TAG, "======jni-get-apk-signature-test======");
+        Log.d(TAG, JniUtil.signatureHashCode(this) + "");
+        Log.d(TAG, "======java-get-apk-signature-test======");
+        Log.d(TAG, ApkSignatureProvider.getApkSianature(this) + "");
+    }
+
+
 }

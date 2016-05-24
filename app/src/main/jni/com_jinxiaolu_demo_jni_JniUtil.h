@@ -33,6 +33,14 @@ JNIEXPORT jbyteArray JNICALL Java_com_jinxiaolu_demo_jni_JniUtil_encrypt
 JNIEXPORT jbyteArray JNICALL Java_com_jinxiaolu_demo_jni_JniUtil_decrypt
   (JNIEnv *, jclass, jbyteArray);
 
+/*
+ * Class:     com_jinxiaolu_demo_jni_JniUtil
+ * Method:    signatureHashCode
+ * Signature: (Ljava/lang/Object;)I
+ */
+JNIEXPORT jint JNICALL Java_com_jinxiaolu_demo_jni_JniUtil_signatureHashCode
+        (JNIEnv *, jclass, jobject);
+
 #ifdef __cplusplus
 }
 #endif

@@ -21,7 +21,7 @@ static unsigned char AES_KEY[32] = { 0x60, 0x3d, 0xeb, 0x10, 0x15, 0xca, 0x71,
 		0x07, 0x3b, 0x61, 0x08, 0xd7, 0x2d, 0x98, 0x10, 0xa3, 0x09, 0x14, 0xdf,
 		0xf4 };
 
-  jbyteArray native_aes(JNIEnv *env,jbyteArray jarray, jint jmode) {
+jbyteArray native_aes(JNIEnv *env,jbyteArray jarray, jint jmode) {
   	//check input data
   	unsigned int len = (unsigned int) ((*env)->GetArrayLength(env, jarray));
   	if (len <= 0 || len >= MAX_LEN) {
@@ -114,4 +114,49 @@ JNIEXPORT jbyteArray JNICALL Java_com_jinxiaolu_demo_jni_JniUtil_encrypt
 JNIEXPORT jbyteArray JNICALL Java_com_jinxiaolu_demo_jni_JniUtil_decrypt
   (JNIEnv *env, jclass jclazz, jbyteArray jarr){
     return native_aes(env, jarr,DECRYPT);
+  }
+
+JNIEXPORT jint JNICALL Java_com_jinxiaolu_demo_jni_JniUtil_signatureHashCode
+		(JNIEnv *env, jclass jclazz, jobject context){
+	//Context的类
+	jclass context_clazz = (*env)->GetObjectClass(env, context);
+	// 得到 getPackageManager 方法的 ID
+	jmethodID methodID_getPackageManager = (*env)->GetMethodID(env, context_clazz,
+															   "getPackageManager", "()Landroid/content/pm/PackageManager;");
+
+	// 获得PackageManager对象
+	jobject packageManager = (*env)->CallObjectMethod(env, context, methodID_getPackageManager);
+//	// 获得 PackageManager 类
+	jclass pm_clazz = (*env)->GetObjectClass(env, packageManager);
+	// 得到 getPackageInfo 方法的 ID
+	jmethodID methodID_pm = (*env)->GetMethodID(env, pm_clazz, "getPackageInfo",
+												"(Ljava/lang/String;I)Landroid/content/pm/PackageInfo;");
+//
+//	// 得到 getPackageName 方法的 ID
+	jmethodID methodID_pack = (*env)->GetMethodID(env, context_clazz,
+												  "getPackageName", "()Ljava/lang/String;");
+
+	// 获得当前应用的包名
+	jstring application_package = (*env)->CallObjectMethod(env, context, methodID_pack);
+	const char *str = (*env)->GetStringUTFChars(env, application_package, 0);
+//	__android_log_print(ANDROID_LOG_DEBUG, "JNI", "packageName: %s\n", str);
+
+	// 获得PackageInfo
+	jobject packageInfo = (*env)->CallObjectMethod(env, packageManager,
+												   methodID_pm, application_package, 64);
+
+	jclass packageinfo_clazz = (*env)->GetObjectClass(env, packageInfo);
+	jfieldID fieldID_signatures = (*env)->GetFieldID(env, packageinfo_clazz,
+													 "signatures", "[Landroid/content/pm/Signature;");
+	jobjectArray signature_arr = (jobjectArray)(*env)->GetObjectField(env, packageInfo,
+																	  fieldID_signatures);
+	//Signature数组中取出第一个元素
+	jobject signature = (*env)->GetObjectArrayElement(env, signature_arr, 0);
+	//读signature的hashcode
+	jclass signature_clazz = (*env)->GetObjectClass(env, signature);
+	jmethodID methodID_hashcode = (*env)->GetMethodID(env, signature_clazz,
+													  "hashCode", "()I");
+	jint hashCode = (*env)->CallIntMethod(env, signature, methodID_hashcode);
+//	__android_log_print(ANDROID_LOG_DEBUG, "JNI", "hashcode: %d\n", hashCode);
+	return hashCode;
   }
